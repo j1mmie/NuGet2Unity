@@ -12,7 +12,7 @@ dotnet run --nugetpackage My.Awesome.Project --folder ../../TopSecretProject
 
 The directory structure at `../../TopSecretProject` should be something like this:
 ```
-➜  src git:(master) ✗ tree ../../TopSecretProject
+$ tree ../../TopSecretProject
 ../../TopSecretProject
 └── My.Awesome.Project.nuspec
 ```
