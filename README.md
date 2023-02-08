@@ -17,8 +17,6 @@ The directory structure at `../../TopSecretProject` should be something like thi
 └── My.Awesome.Project.nuspec
 ```
 
-Original README:
-
 # NuGet2Unity
 
 A .NET Core app to package a NuGet package (and dependencies) as a .UnityPackage for import into a Unity 2018 (or higher) project.
@@ -40,6 +38,7 @@ Assuming you are in the `src` directory, simply run the standard `dotnet run` co
 Switch | Description
 -------|-------------
 -n, --nugetpackage  |  Required. NuGet package to repackage
+-f, --folder        |  A path (relative or absolute) to a local C# project that has a .nuspec file. When supplied, this local project will serve as the root instead of fetching a remote NuGet package. If supplied, --version is ignored
 -v, --version       |  Version of NuGet package to use
 -p, --unityproject  |  Path to the Unity project to include with this package
 -m, --includemeta   |  Include .meta files from the Unity project
