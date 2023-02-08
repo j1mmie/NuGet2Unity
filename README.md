@@ -1,3 +1,24 @@
+# NEW FEATURES in this fork:
+
+This fork of NuGet2Unity supports an additional option, `-f` (or `--folder`), an absolute or relative path to a folder containing a .nuspec file. The name of the file must match the (required) value of the `-n` (or `--nugetpackage`) option. When `--folder` is supplied, NuGet2Unity will download the dependencies of *the local* .nuspec file, rather than first fetching the package from NuGet. All subsequent dependencies will be fetched from NuGet.
+
+This is useful for bundling NuGet packages for a local, private project, that doesn't exist on NuGet itself.
+
+Example:
+
+```
+dotnet run --nugetpackage My.Awesome.Project --folder ../../TopSecretProject
+```
+
+The directory structure at `../../TopSecretProject` should be something like this:
+```
+➜  src git:(master) ✗ tree ../../TopSecretProject
+../../TopSecretProject
+└── My.Awesome.Project.nuspec
+```
+
+Original README:
+
 # NuGet2Unity
 
 A .NET Core app to package a NuGet package (and dependencies) as a .UnityPackage for import into a Unity 2018 (or higher) project.
