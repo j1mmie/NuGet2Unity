@@ -11,6 +11,7 @@ using NuGet.Packaging;
 using NuGet.Frameworks;
 using System.Net;
 using System.IO.Compression;
+using System.Security.Policy;
 
 namespace NuGet2Unity
 {
@@ -51,7 +52,13 @@ namespace NuGet2Unity
 			Directory.CreateDirectory(pluginsDir);
 			ConsoleWriteLine($"Plugins dir: {pluginsDir}", Console.BackgroundColor, true);
 
-			bool success = DownloadPackage(opt.Package, opt.Version, downloadDir);
+			bool success = false;
+			if (string.IsNullOrEmpty(opt.Folder)) {
+				success = DownloadPackage(opt.Package, opt.Version, downloadDir);
+			} else {
+				success = CopyNuspec(opt.Folder, opt.Package, downloadDir);
+			}
+
 			if(success)
 			{
 				string version = GetPackageVersion(downloadDir, opt.Package);
@@ -70,8 +77,10 @@ namespace NuGet2Unity
 		{
 			// see if there's a nuspec for this package, bail out if there isn't
 			string nuspec = Path.Combine(dir, package, package + ".nuspec");
-			if(!File.Exists(nuspec))
+			if(!File.Exists(nuspec)) {
+				ConsoleWriteLine("No package version found");
 				return null;
+			}
 
 			// parse the nuspec
 			FileStream fs = new FileStream(nuspec, FileMode.Open);
@@ -119,6 +128,40 @@ namespace NuGet2Unity
 			return true;
 		}
 
+		private static bool CopyNuspec(string folderPath, string packageName, string targetDir)
+		{
+				if (folderPath.StartsWith(".")) {
+					var cwd = Directory.GetCurrentDirectory();
+					folderPath = Path.Combine(cwd, folderPath);
+				}
+
+				ConsoleWriteLine($"CopyNuspec Folder: {folderPath}");
+
+				string fileName = $"{packageName}.nuspec";
+				string nuspecSource = Path.Combine(folderPath, fileName);
+
+				string folderDest = Path.Combine(targetDir, packageName);
+				string nuspecDest = Path.Combine(folderDest, fileName);
+
+				if (!File.Exists(nuspecSource)) {
+					ConsoleWriteLine($".nuspec file not found at {nuspecSource}");
+					return false;
+				}
+
+				if (!Directory.Exists(folderPath)) {
+					ConsoleWriteLine($"Unable to find folder at {folderPath}");
+					return false;
+				}
+
+				ConsoleWriteLine($"CopyNuspec CreateDirectory: {folderDest}");
+				Directory.CreateDirectory(folderDest);
+
+				ConsoleWriteLine($"CopyNuspec File.Copy: {nuspecSource} => {nuspecDest}");
+				File.Copy(nuspecSource, nuspecDest);
+
+				return true;
+		}
+
 		private static bool CopyFiles(string temp, string working, Options opt)
 		{
 			// delete any existing working files
@@ -129,7 +172,7 @@ namespace NuGet2Unity
 
 			string[] dependencies = GetDependencies(temp, opt.Package);
 
-			ConsoleWrite("Copying files...");
+			ConsoleWrite($"Copying files to {working}...");
 
 			foreach (string dependency in dependencies)
 			{
@@ -172,8 +215,10 @@ namespace NuGet2Unity
 
 			// see if there's a nuspec for this package, bail out if there isn't
 			string nuspec = Path.Combine(dir, package, package + ".nuspec");
-			if(!File.Exists(nuspec))
+			if(!File.Exists(nuspec)) {
+				ConsoleWriteLine($".nuspec file not found at {nuspec}.");
 				return null;
+			}
 
 			// parse the nuspec
 			FileStream fs = new FileStream(nuspec, FileMode.Open);

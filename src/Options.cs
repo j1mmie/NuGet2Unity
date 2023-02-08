@@ -7,6 +7,9 @@ namespace NuGet2Unity
 		[Option('n', "nugetpackage", Required = true, HelpText = "NuGet package to repackage")]
 		public string Package { get; set; }
 
+		[Option('f', "folder", HelpText = "Path to a folder containing a local .nuspec file, which will be used instead of checking Nuget.")]
+		public string Folder { get; set; }
+
 		[Option('v', "version", HelpText = "Version of NuGet package to use")]
 		public string Version { get; set; }
 
